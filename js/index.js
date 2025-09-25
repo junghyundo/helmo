@@ -71,5 +71,36 @@ document.getElementById("nextMonth").addEventListener("click", () => {
     renderCalendar(currentMonth, currentYear);
 });
 
+function updateDates() {
+  const today = new Date();
+
+  // 일별 기록
+  const dailyDate = today.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  document.getElementById('daily-date').textContent = dailyDate;
+
+  // 주간 기록 (이번 주 월요일 ~ 일요일)
+  const dayOfWeek = today.getDay(); // 0(일) ~ 6(토)
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const weeklyDate = `${monday.toLocaleDateString('ko-KR')} ~ ${sunday.toLocaleDateString('ko-KR')}`;
+  document.getElementById('weekly-date').textContent = weeklyDate;
+
+  // 월간 기록
+  const monthlyDate = today.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+  });
+  document.getElementById('monthly-date').textContent = monthlyDate;
+}
+
+updateDates();
+
 // 초기 렌더링
 renderCalendar(currentMonth, currentYear);
