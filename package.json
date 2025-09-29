@@ -1,0 +1,14 @@
+{
+  "name": "helmo",
+  "version": "1.0.0",
+  "description": "사이드 임펙트 팀 웹사이트",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
