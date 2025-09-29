@@ -9,10 +9,9 @@
 
 const express = require('express');
 const app = express();
-const port = 3000;
 
 // app.use(express.static());
-app.use(express.static(__dirname+"/"));
+// app.use('/', express.static(__dirname+"/"));
 
 // Home 페이지 라우트
 app.get('/', (req, res) => {
@@ -27,8 +26,4 @@ app.get('/', (req, res) => {
 // Product 페이지 라우트
 // app.get('/result', (req, res) => {
 //   res.sendFile(__dirname + '/result.html');
-// });
-
-// app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`);
 // });
