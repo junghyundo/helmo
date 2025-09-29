@@ -28,7 +28,11 @@ app.get('/detail', (req, res) => {
   res.sendFile(__dirname + '/detail.html');
 });
 
-
+app.get('/lee', (req, res) => {
+  res.send(
+    "<center><h1>이윤지의 사이트</h1><p>This is the Lee's page.</p><img src='/src/Always_Smile.jpg' alt="+"Lee's Avatar></center>"
+  );
+});
 // Product 페이지 라우트
 // app.get('/result', (req, res) => {
 //   res.sendFile(__dirname + '/result.html');
