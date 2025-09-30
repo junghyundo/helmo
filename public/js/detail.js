@@ -68,8 +68,17 @@ multipleFileInput.addEventListener("change", (event) => {
 const rbtn = document.getElementsByClassName("save-btn");
 
 function buttonClicked(){
-    window.location.href = `result.html`;
+    // URL에서 date 파라미터를 가져와서 result.html로 전달
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    
+    if (dateParam) {
+        window.location.href = `result.html?date=${dateParam}`;
+    } else {
+        window.location.href = `result.html`;
+    }
 };
+
 
 // 파일 선택 개수 업데이트
 function updateFileCounter() {

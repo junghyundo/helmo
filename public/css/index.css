@@ -11,6 +11,10 @@ header {
     padding: 20px;
 }
 
+a{
+    text-decoration: none;
+}
+
 header h1 {
     font-size: 28px;
     margin: 0;
@@ -62,17 +66,17 @@ header h1 {
 }
 
 .calendar-grid div {
-    padding: 10px 0;
+    padding: 25px 0;
     border-radius: 6px;
     cursor: pointer;
 }
 
 .calendar-grid div:hover {
-    background: #f1f7ff;
+    background: #aee8fa;
 }
 
 .calendar-grid .selected {
-    background: #007bff;
+    background: #00a2ff;
     color: white;
     font-weight: bold;
 }
@@ -124,4 +128,69 @@ header h1 {
 
 .saturday {
     color: blue;
+}
+
+/* 날짜 hover 효과 */
+.day {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* .day:hover {
+    background-color: #e3f2fd;
+    transform: scale(1.05);
+} */
+
+/* 날짜 hover 시 나타나는 버튼들 */
+.day-buttons {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    border-radius: 8px;
+    background-color: transparent;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.day:hover .day-buttons {
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
+}
+
+.day-btn {
+    padding: 4px 8px;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* .day-btn:hover {
+    background: #0056b3;
+} */
+
+.day-btn.record {
+    background: #ffffff;
+    color: #007bff;
+}
+
+.day-btn.record:hover {
+    background: #007bff;
+    color: #ffffff;
+}
+
+.day-btn.view {
+    background: #ffffff;
+    color: #007bff;
+}
+
+.day-btn.view:hover {
+    background: #007bff;
+    color: #ffffff;
 }
