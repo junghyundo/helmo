@@ -105,8 +105,15 @@ document.getElementById("nextMonth").addEventListener("click", () => {
 });
 
 // 선택된 날짜를 기준으로 모든 기록 날짜 업데이트하는 함수
-function updateAllDates(year, month, day) {
+async function updateAllDates(year, month, day) {
+  // 시간대 문제를 피하기 위해 직접 문자열 생성
+  const dateString = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
   const selectedDate = new Date(year, month, day);
+  
+  // 🔍 디버깅 로그
+  console.log(`🗓️ 클릭한 날짜: ${year}년 ${month + 1}월 ${day}일`);
+  console.log(`📅 생성된 dateString: ${dateString}`);
+  console.log(`🔥 Firebase용 날짜: ${dateString.replace(/-/g, '')}`);
   
   // 일별 기록
   const dailyDate = selectedDate.toLocaleDateString('ko-KR', {
@@ -115,6 +122,16 @@ function updateAllDates(year, month, day) {
     day: 'numeric'
   });
   document.getElementById('daily-date').textContent = dailyDate;
+  
+  // Firebase에서 일별 데이터 가져오기
+  try {
+    const dailyResult = await firebaseUtils.getDailyData(dateString);
+    const dailyContent = document.querySelector('.card:nth-child(1) .content');
+    dailyContent.textContent = firebaseUtils.formatDailyResult(dailyResult);
+  } catch (error) {
+    console.error('일별 데이터 로드 실패:', error);
+    document.querySelector('.card:nth-child(1) .content').textContent = '데이터 로드 실패';
+  }
   
   // 주간 기록 (선택된 날짜가 포함된 주의 월요일 ~ 일요일)
   const dayOfWeek = selectedDate.getDay(); // 0(일) ~ 6(토)
@@ -126,12 +143,35 @@ function updateAllDates(year, month, day) {
   const weeklyDate = `${monday.toLocaleDateString('ko-KR')} ~ ${sunday.toLocaleDateString('ko-KR')}`;
   document.getElementById('weekly-date').textContent = weeklyDate;
 
+  // Firebase에서 주간 데이터 가져오기 (문자열 형태로 전달)
+  try {
+    const mondayString = `${monday.getFullYear()}-${(monday.getMonth() + 1).toString().padStart(2, '0')}-${monday.getDate().toString().padStart(2, '0')}`;
+    const sundayString = `${sunday.getFullYear()}-${(sunday.getMonth() + 1).toString().padStart(2, '0')}-${sunday.getDate().toString().padStart(2, '0')}`;
+    
+    const weeklyAverage = await firebaseUtils.getWeeklyData(mondayString, sundayString);
+    const weeklyContent = document.querySelector('.card:nth-child(2) .content');
+    weeklyContent.textContent = firebaseUtils.formatWeeklyResult(weeklyAverage);
+  } catch (error) {
+    console.error('주간 데이터 로드 실패:', error);
+    document.querySelector('.card:nth-child(2) .content').textContent = '데이터 로드 실패';
+  }
+
   // 월간 기록 (선택된 날짜의 월)
   const monthlyDate = selectedDate.toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
   });
   document.getElementById('monthly-date').textContent = monthlyDate;
+
+  // Firebase에서 월간 데이터 가져오기
+  try {
+    const monthlyAverage = await firebaseUtils.getMonthlyData(year, month + 1); // month는 0부터 시작하므로 +1
+    const monthlyContent = document.querySelector('.card:nth-child(3) .content');
+    monthlyContent.textContent = firebaseUtils.formatMonthlyResult(monthlyAverage);
+  } catch (error) {
+    console.error('월간 데이터 로드 실패:', error);
+    document.querySelector('.card:nth-child(3) .content').textContent = '데이터 로드 실패';
+  }
 }
 
 function updateDates() {
