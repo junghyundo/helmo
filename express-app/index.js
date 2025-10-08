@@ -45,8 +45,9 @@ app.get('/result-pdf', (req, res) => {
     // PDF를 응답으로 파이프
     doc.pipe(res);
 
-    // 한글 폰트 설정 (Windows 시스템 폰트 사용)
-    const fontPath = './public/fonts/malgun.ttf'; // 맑은 고딕
+    // 한글 폰트 설정 (절대 경로 사용)
+    const path = require('path');
+    const fontPath = path.join(__dirname, 'public', 'fonts', 'MALGUN.TTF');
     
     // PDF 내용 작성
     doc.fontSize(24)
@@ -95,23 +96,12 @@ app.get('/result-pdf', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+// Vercel을 위한 조건부 리스너
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
+  });
+}
 
-// ... admin 초기화 코드 위에 추가 ...
-
-// app.get('/helmo', async (req, res) => {
-//   try {
-//     const snapshot = await db.collection('result').get(); // 컬렉션 이름 지정
-//     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-//     res.status(200).json(data);
-//   } catch (error) {
-//     console.error("Error fetching data: ", error);
-//     res.status(500).send("Error fetching data");
-//   }
-// });
-
-app.listen(3000, () => {
-  console.log('Express server running on port 3000');
-});
+// Vercel을 위한 모듈 내보내기
+module.exports = app;
