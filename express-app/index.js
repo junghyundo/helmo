@@ -12,11 +12,12 @@ const app = express();
 const port = 3000;
 
 // app.use(express.static());
-app.use('/', express.static(__dirname+"/public"));
+const path = require('path');
+app.use('/', express.static(path.join(__dirname, "public")));
 
 // Home 페이지 라우트
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // app.get('/detail', (req, res) => {
@@ -46,7 +47,6 @@ app.get('/result-pdf', (req, res) => {
     doc.pipe(res);
 
     // 한글 폰트 설정 (절대 경로 사용)
-    const path = require('path');
     const fontPath = path.join(__dirname, 'public', 'fonts', 'MALGUN.TTF');
     
     // PDF 내용 작성
