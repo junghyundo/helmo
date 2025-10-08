@@ -1,15 +1,8 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "express-app/index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/express-app/index.js"
+      "source": "/(.*)",
+      "destination": "/express-app/index.js"
     }
   ]
 }
