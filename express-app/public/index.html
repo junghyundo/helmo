@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <title>Helmo 기록</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <!-- Firebase SDK for Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- PDF 생성을 위한 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <!-- 햄버거 메뉴 버튼 -->
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <div class="hamburger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>메뉴</h3>
+        <button class="close-btn" id="closeSidebar">&times;</button>
+      </div>
+      <div class="sidebar-content">
+        <div class="menu-item" id="pdfDownloadMenu">
+          <div class="menu-icon">📄</div>
+          <div class="menu-text">PDF 다운로드</div>
+        </div>
+        <div class="menu-item" id="monthlyAnalysisMenu">
+          <div class="menu-icon">📊</div>
+          <div class="menu-text">월별 분석 보기</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 사이드바 배경 오버레이 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <header>
+      <a href="/"><h1>Helmo 로고</h1></a>
+    </header>
+
+    <div class="notice">
+      <!-- 안녕하세요! <strong>날짜를 클릭</strong>하시면 상세 정보를 확인하실 수 있습니다. -->
+      😊 안녕하세요! <strong>날짜를 클릭</strong>하시면 상세 정보를 확인하실 수 있습니다.
+    </div>
+
+    <section class="calendar">
+      <div class="calendar-header">
+        <button id="prevMonth">&lt;</button>
+        <div id="monthYear">2025년 8월</div>
+        <button id="nextMonth">&gt;</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid">
+        </div>
+    </section>
+
+    <section class="cards">
+      <div class="card">
+        <h3>일별 기록</h3>
+        <div class="date" id="daily-date"></div>
+        <div class="content">결과 없음</div>
+      </div>
+      <div class="card">
+        <h3>주간 기록</h3>
+        <div class="date" id="weekly-date"></div>
+        <div class="content">등급 / 평균 착용률</div>
+      </div>
+      <div class="card">
+        <h3>월간 기록</h3>
+        <div class="date" id="monthly-date"></div>
+        <div class="content">등급 / 월 평균 착용률</div>
+      </div>
+    </section>
+
+    <script type="text/javascript" src="/js/firebase-config.js"></script>
+    <script type="text/javascript" src="/js/test-data.js"></script>
+    <script type="text/javascript" src="/js/callender.js"></script>
+    
+    <script>
+      // 사이드바 관련 함수들
+      function openSidebar() {
+        document.getElementById('sidebar').classList.add('active');
+        document.getElementById('sidebarOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden'; // 스크롤 방지
+      }
+
+      function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+        document.body.style.overflow = ''; // 스크롤 복원
+      }
+
+      // 월별 분석 상세보기 함수
+      function goToMonthlyResult() {
+        // 현재 캘린더에서 선택된 월 정보를 가져옴
+        const monthYearText = document.getElementById('monthYear').textContent;
+        const match = monthYearText.match(/(\d{4})년\s*(\d{1,2})월/);
+        
+        if (match) {
+          const year = match[1];
+          const month = match[2];
+          
+          // month_result.html로 현재 연도와 월을 쿼리 파라미터로 넘겨 이동
+          window.location.href = `month_result.html?year=${year}&month=${month}`;
+        } else {
+          alert('월 정보를 가져올 수 없습니다.');
+        }
+      }
+
+      // PDF 다운로드 함수
+      function downloadPDF() {
+        const monthYear = document.getElementById('monthYear').textContent;
+        const monthlyCard = document.querySelector('.card:nth-child(3)');
+
+        // html2canvas를 사용하여 월간 기록 카드를 이미지로 변환
+        html2canvas(monthlyCard).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF('p', 'mm', 'a4');
+          const imgWidth = 210;
+          const pageHeight = 295;
+          const imgHeight = canvas.height * imgWidth / canvas.width;
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          // 이미지를 PDF에 추가
+          doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          // 이미지가 페이지를 넘어갈 경우 새 페이지 추가
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          // PDF 파일 다운로드
+          doc.save(`Helmo_월간_보고서_${monthYear}.pdf`);
+          
+          // 사이드바 닫기
+          closeSidebar();
+        }).catch(error => {
+          console.error('PDF 생성 중 오류:', error);
+          alert('PDF 생성 중 오류가 발생했습니다.');
+        });
+      }
+
+      // 페이지 로드 후 이벤트 리스너 등록
+      document.addEventListener('DOMContentLoaded', function() {
+        // 햄버거 메뉴 버튼 이벤트
+        document.getElementById('hamburgerMenu').addEventListener('click', openSidebar);
+        
+        // 사이드바 닫기 버튼 이벤트
+        document.getElementById('closeSidebar').addEventListener('click', closeSidebar);
+        
+        // 오버레이 클릭 시 사이드바 닫기
+        document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+        
+        // PDF 다운로드 메뉴 이벤트
+        document.getElementById('pdfDownloadMenu').addEventListener('click', downloadPDF);
+        
+        // 월별 분석 메뉴 이벤트
+        document.getElementById('monthlyAnalysisMenu').addEventListener('click', function() {
+          closeSidebar();
+          goToMonthlyResult();
+        });
+
+        // ESC 키로 사이드바 닫기
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            closeSidebar();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

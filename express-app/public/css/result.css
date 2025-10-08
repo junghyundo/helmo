@@ -68,3 +68,11 @@ body {
 .inquiry-btn:hover {
   background: #0056b3;
 }
+
+.no-image {
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
+  padding: 20px 10px;
+  display: inline-block;
+}

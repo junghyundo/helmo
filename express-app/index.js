@@ -101,16 +101,16 @@ app.listen(port, () => {
 
 // ... admin 초기화 코드 위에 추가 ...
 
-app.get('/helmo', async (req, res) => {
-  try {
-    const snapshot = await db.collection('result').get(); // 컬렉션 이름 지정
-    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error fetching data: ", error);
-    res.status(500).send("Error fetching data");
-  }
-});
+// app.get('/helmo', async (req, res) => {
+//   try {
+//     const snapshot = await db.collection('result').get(); // 컬렉션 이름 지정
+//     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//     res.status(200).json(data);
+//   } catch (error) {
+//     console.error("Error fetching data: ", error);
+//     res.status(500).send("Error fetching data");
+//   }
+// });
 
 app.listen(3000, () => {
   console.log('Express server running on port 3000');
